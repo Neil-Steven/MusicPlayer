@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Music Player</string>
+    <string name="version">1.0</string>
+    <string name="about_me">关于Neil Player</string>
+    <string name="refresh">刷新列表</string>
+    <string name="init_time">00:00</string>
+    <string name="now_playing">当前正在播放：\n</string>
+</resources>

@@ -1,0 +1,37 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme.Base" parent="Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="android:colorPrimary">#4285F4</item>
+        <item name="android:colorPrimaryDark">#3367D6</item>
+        <item name="android:navigationBarColor">#3367D6</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowNoTitle">true</item>
+
+        <item name="colorPrimary">#4285F4</item>
+        <item name="colorPrimaryDark">#3367D6</item>
+    </style>
+    <style name="AppTheme" parent="AppTheme.Base" />
+
+    <!-- toolbar菜单样式 -->
+    <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.ActionBar">
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+
+    <!-- toolbar弹出菜单样式 -->
+    <style name="ToolbarPopupTheme" parent="@style/ThemeOverlay.AppCompat">
+        <item name="android:colorBackground">@android:color/white</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+    </style>
+
+    <style name="ToolbarTitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:fontFamily">sans-serif-smallcaps</item>
+        <item name="android:textStyle">normal|bold</item>
+        <item name="android:textSize">24sp</item>
+
+    </style>
+
+</resources>
