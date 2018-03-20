@@ -1,0 +1,30 @@
+<resources>
+    <!--Menu-->
+    <string name="refresh_list">刷新列表</string>
+    <string name="about">关于</string>
+
+    <!--MainActivity-->
+    <string name="current_song">当前正在播放：\n</string>
+
+    <!--通用-->
+    <string name="ok">好的</string>
+    <string name="got_it">我知道啦！</string>
+    <string name="alert">提示</string>
+
+    <!--Toast-->
+    <string name="press_again_to_exit">再按一次退出本程序</string>
+    <string name="refresh_list_succeed">列表刷新成功！</string>
+    <string name="has_changed_to_mode">已切换至%1$s模式</string>
+
+    <!--模式-->
+    <string name="repeat">单曲循环</string>
+    <string name="shuffle">随机播放</string>
+    <string name="circle">列表循环</string>
+
+    <!--权限-->
+    <string name="no_permission">没有读取存储卡权限，本程序即将推出……</string>
+
+    <!--关于信息-->
+    <string name="about_message">"Written by Neil Steven with Kotlin！\n\n本demo仅用于浅尝Kotlin语法，代码逻辑层面还有较多不完善的地方，仅供参考，日后如有时间再来填坑^_^"</string>
+
+</resources>

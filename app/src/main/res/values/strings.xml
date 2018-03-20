@@ -1,8 +1,34 @@
 <resources>
-    <string name="app_name">Music Player</string>
-    <string name="version">1.0</string>
-    <string name="about_me">关于Neil Player</string>
-    <string name="refresh">刷新列表</string>
+    <!--Menu-->
+    <string name="refresh_list">Refresh list</string>
+    <string name="about">About</string>
+
+    <!--MainActivity-->
+    <string name="current_song">Current song: \n</string>
+
+    <!--Common-->
+    <string name="ok">OK</string>
+    <string name="got_it">Got it!</string>
+    <string name="alert">Alert</string>
+
+    <!--Toast-->
+    <string name="press_again_to_exit">Press again to exit</string>
+    <string name="refresh_list_succeed">Refresh list succeed!</string>
+    <string name="has_changed_to_mode">Has changed to %1$s mode</string>
+
+    <!--Mode-->
+    <string name="repeat">repeat</string>
+    <string name="shuffle">shuffle</string>
+    <string name="circle">circle</string>
+
+    <!--Permission-->
+    <string name="no_permission">No read external storage permission! Exit now…</string>
+
+    <!--About message-->
+    <string name="about_message">"Written by Neil Steven with Kotlin！\n\nThis demo is too simple to be useful, so just focus on the new language~"</string>
+
+    <!--Need not translate-->
+    <string name="app_name">Neil Music Player</string>
     <string name="init_time">00:00</string>
-    <string name="now_playing">当前正在播放：\n</string>
+
 </resources>
