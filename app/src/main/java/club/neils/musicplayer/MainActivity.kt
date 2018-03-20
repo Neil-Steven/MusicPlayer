@@ -1,4 +1,4 @@
-package ns.musicplayer
+package club.neils.musicplayer
 
 import android.Manifest
 import android.app.AlertDialog
@@ -19,12 +19,12 @@ import android.view.View
 import android.widget.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.concurrent.Executors
-import ns.musicplayer.Consts.*
-
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
 
-    private val READ_EXTERNAL_STORAGE_REQUEST_CODE = 0   // 用于回调时检测的requestCode
+    // 权限申请相关
+    private var actionOnPermission: ((granted: Boolean) -> Unit)? = null
+    private val myRequestPermissionCode = 12345
 
     private var mTotalTime = 0         // 当前音乐的总时间
     private var mCurrentTime = 0       // 实时更新当前时间
@@ -40,10 +40,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var list = mutableListOf<Map<String, String>>()
 
     private var activityReceiver = MyActivityReceiver()
-    private var intentService = Intent(this, MusicService::class.java)
+    private var intentService = Intent()
 
-    private var status = STATUS_STOP       // 记录当前状态，默认为停止状态
-    private var mode = MODE_CIRCLE         // 记录当前播放模式，默认为列表循环
+    private var status = STATUS_STOP        // 记录当前状态，默认为停止状态
+    private var mode = MODE_CIRCLE          // 记录当前播放模式，默认为列表循环
+
+    private var toast: Toast? = null        // 保存toast实例以防止连续弹出的Toast重叠
+
+    private var lastExitTime: Long = 0      // 保存上次尝试返回的时间
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,28 +62,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     musicLists.clear()
                     list.clear()
                     initMusicList()
-                    val intent = Intent(CONTROL_ACTION)
-                    sendBroadcast(intent)
-                    showToast("列表刷新成功！")
+                    sendBroadcast(Intent(CONTROL_ACTION))
+                    showToast(R.string.refresh_list_succeed)
                 }
 
-                R.id.about_me ->
+                R.id.about ->
                     AlertDialog.Builder(this)
-                            .setTitle(resources.getString(R.string.app_name) + " " + resources.getString(R.string.version))
-                            .setMessage("Written by Neil Steven with Kotlin！\n\n本demo仅用于浅尝Kotlin语法，代码逻辑层面还有较多不完善的地方，仅供参考，日后如有时间再来填坑^_^")
-                            .setPositiveButton("我知道了", null)
+                            .setTitle(getAppName(this) + " " + getVersionName(this))
+                            .setMessage(R.string.about_message)
+                            .setPositiveButton(R.string.got_it, null)
                             .show()
             }
             true
         }
 
-        // 进入软件前先检测是否已经被赋予了读取存储卡的权限
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermission()
-        } else {
-            init()
-            refreshTimePosition()
-        }
+        tryToInit()
     }
 
     override fun onDestroy() {
@@ -101,7 +98,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-
     override fun onClick(p0: View?) {
         val intent = Intent(CONTROL_ACTION)
         when (p0!!.id) {
@@ -118,20 +114,23 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 this.moveTaskToBack(true)
             }
             R.id.modeButton -> {
-                if (mode == MODE_CIRCLE) {
-                    mode = MODE_REPEAT
-                    modeButton.setBackgroundResource(R.drawable.repeat_button_selector)
-                    showToast("已切换至单曲循环模式")
-                } else if (mode == MODE_REPEAT) {
-                    mode = MODE_SHUFFLE
-                    modeButton.setBackgroundResource(R.drawable.shuffle_button_selector)
-                    showToast("已切换至随机播放模式")
-                } else {
-                    mode = MODE_CIRCLE
-                    modeButton.setBackgroundResource(R.drawable.circle_button_selector)
-                    showToast("已切换至列表循环模式")
+                when (mode) {
+                    MODE_CIRCLE -> {
+                        mode = MODE_REPEAT
+                        modeButton.setBackgroundResource(R.drawable.repeat_button_selector)
+                        showToast(String.format(getString(R.string.has_changed_to_mode), getString(R.string.repeat)))
+                    }
+                    MODE_REPEAT -> {
+                        mode = MODE_SHUFFLE
+                        modeButton.setBackgroundResource(R.drawable.shuffle_button_selector)
+                        showToast(String.format(getString(R.string.has_changed_to_mode), getString(R.string.shuffle)))
+                    }
+                    else -> {
+                        mode = MODE_CIRCLE
+                        modeButton.setBackgroundResource(R.drawable.circle_button_selector)
+                        showToast(String.format(getString(R.string.has_changed_to_mode), getString(R.string.circle)))
+                    }
                 }
-
                 intent.putExtra("control", CONTROL_CHANGE_MODE)
                 intent.putExtra("mode", mode)
             }
@@ -139,44 +138,52 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         sendBroadcast(intent)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    // 重写onKeyDown方法实现按两次返回退出程序
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // 两次按键间隔不超过1秒视为退出
+            if (System.currentTimeMillis() - lastExitTime > 1000) {
+                showToast(R.string.press_again_to_exit)
+                lastExitTime = System.currentTimeMillis()
+            } else {
+                exitFlag = true
+                // 通知Service中线程停止
+                val sendIntent = Intent(CONTROL_ACTION)
+                sendIntent.putExtra("control", CONTROL_EXIT)
+                sendBroadcast(sendIntent)
 
-        if (requestCode == READ_EXTERNAL_STORAGE_REQUEST_CODE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                stopService(intentService)
+                exit()
+            }
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == myRequestPermissionCode && grantResults.isNotEmpty()) {
+            actionOnPermission?.invoke(grantResults[0] == 0)
+        }
+    }
+
+    private fun tryToInit() {
+        handlePermission(Manifest.permission.READ_EXTERNAL_STORAGE) {
+            if (it) {
                 init()
                 refreshTimePosition()
             } else {
                 AlertDialog.Builder(this)
-                        .setTitle("提示")
-                        .setMessage("您已拒绝授权，本程序即将退出。")
-                        .setPositiveButton("好的") { _, _ -> exit() }
+                        .setTitle(R.string.alert)
+                        .setMessage(R.string.no_permission)
+                        .setPositiveButton(R.string.ok) { _, _ -> exit() }
                         .show()
             }
         }
     }
 
-
-    // 申请读取存储卡权限
-    fun requestPermission() {
-        // 如果用户已经拒绝过一次
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            AlertDialog.Builder(this)
-                    .setTitle("提示")
-                    .setMessage("您已经拒绝过本程序申请读取存储卡的权限，如果继续拒绝，本程序将依然退出。")
-                    .setPositiveButton("我知道了") { _, _ ->
-                        ActivityCompat.requestPermissions(this,
-                                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                                READ_EXTERNAL_STORAGE_REQUEST_CODE)
-                    }.show()
-        } else {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), READ_EXTERNAL_STORAGE_REQUEST_CODE)
-        }
-    }
-
-
     // 初始化方法
-    fun init() {
+    private fun init() {
         // 为按钮的单击事件添加监听器
         playButton.setOnClickListener(this)
         nextButton.setOnClickListener(this)
@@ -198,24 +205,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         startService(intentService)
     }
 
-
-    // 弹出Toast方法
-    private var toast: Toast? = null
-    fun showToast(text: String, duration: Int = Toast.LENGTH_SHORT) {
-        // 防止连续弹出的Toast重叠
-        if (toast != null) {
-            toast!!.cancel()
-            toast!!.setText(text)
-            toast!!.duration = duration
-        }
-        toast = Toast.makeText(this, text, duration)
-        toast!!.show()
-    }
-
-
-
     // 初始化播放列表
-    fun initMusicList() {
+    private fun initMusicList() {
         // 取得指定位置的文件设置显示到播放列表
         val music = arrayOf(MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.DISPLAY_NAME,
@@ -252,15 +243,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-
-    fun setTotalTime() {
+    private fun setTotalTime() {
         totalTimeText.text = formatTime(mTotalTime)
         seekBar.progress = 0
         seekBar.max = mTotalTime
     }
 
 
-    fun updateTimePosition() {
+    private fun updateTimePosition() {
         if (mCurrentTime > mTotalTime) {
             mCurrentTime = 0
             status = STATUS_PAUSE
@@ -269,8 +259,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         playingTimeText.text = formatTime(mCurrentTime)
     }
 
-
-    fun refreshTimePosition() {
+    private fun refreshTimePosition() {
         singleThreadExecutor.execute {
             while (true) {
                 try {
@@ -292,6 +281,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    // 弹出Toast方法
+    private fun showToast(messageId: Int, duration: Int = Toast.LENGTH_SHORT) {
+        showToast(getString(messageId), duration)
+    }
+
+    private fun showToast(text: String, duration: Int = Toast.LENGTH_SHORT) {
+        // 防止连续弹出的Toast重叠
+        if (toast != null) {
+            toast!!.cancel()
+            toast!!.setText(text)
+            toast!!.duration = duration
+        }
+        toast = Toast.makeText(this, text, duration)
+        toast!!.show()
+    }
 
     private fun formatTime(second: Int): String {
         val minuteString = String.format("%d%d", second / 60 / 10, second / 60 % 10)
@@ -299,6 +303,50 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         return String.format("%s:%s", minuteString, secondString)
     }
 
+    private fun handlePermission(permissionString: String, callback: (granted: Boolean) -> Unit) {
+        actionOnPermission = null
+        if (ContextCompat.checkSelfPermission(this, permissionString) == PackageManager.PERMISSION_GRANTED) {
+            callback(true)
+        } else {
+            actionOnPermission = callback
+            ActivityCompat.requestPermissions(this, arrayOf(permissionString), myRequestPermissionCode)
+        }
+    }
+
+    private fun exit() {
+        this.finish()
+        android.os.Process.killProcess(android.os.Process.myPid()) //获取PID
+        System.exit(0)
+    }
+
+    // 自定义musicSeekBar的监听器
+    private inner class MySeekBarListener : SeekBar.OnSeekBarChangeListener {
+        override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
+            // 必须在非停止状态下才能响应
+            if (status != STATUS_STOP) {
+                playingTimeText.text = formatTime(seekBar.progress)
+            }
+        }
+
+        override fun onStartTrackingTouch(seekBar: SeekBar) {
+            isTracking = true
+        }
+
+        override fun onStopTrackingTouch(seekBar: SeekBar) {
+            isTracking = false
+            // 必须在非停止状态下才能响应
+            if (status != STATUS_STOP) {
+                // 先更新SeekBar进度
+                mCurrentTime = seekBar.progress
+                // 再更新播放进度
+                val intent = Intent(CONTROL_ACTION)
+                intent.putExtra("control", CONTROL_TRACK)
+                intent.putExtra("progress", seekBar.progress * 1000)
+                sendBroadcast(intent)
+            } else
+                seekBar.progress = 0
+        }
+    }
 
     // MainActivity的Receiver
     inner class MyActivityReceiver : BroadcastReceiver() {
@@ -332,66 +380,5 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
         }
-    }
-
-
-    // 自定义musicSeekBar的监听器
-    private inner class MySeekBarListener : SeekBar.OnSeekBarChangeListener {
-        override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
-            // 必须在非停止状态下才能响应
-            if (status != STATUS_STOP) {
-                playingTimeText.text = formatTime(seekBar.progress)
-            }
-        }
-
-        override fun onStartTrackingTouch(seekBar: SeekBar) {
-            isTracking = true
-        }
-
-        override fun onStopTrackingTouch(seekBar: SeekBar) {
-            isTracking = false
-            // 必须在非停止状态下才能响应
-            if (status != STATUS_STOP) {
-                // 先更新SeekBar进度
-                mCurrentTime = seekBar.progress
-                // 再更新播放进度
-                val intent = Intent(CONTROL_ACTION)
-                intent.putExtra("control", CONTROL_TRACK)
-                intent.putExtra("progress", seekBar.progress * 1000)
-                sendBroadcast(intent)
-            } else
-                seekBar.progress = 0
-        }
-    }
-
-
-    // 重写onKeyDown方法实现按两次返回退出程序
-    private var lastExitTime: Long = 0
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            // 两次按键间隔不超过1秒视为退出
-            if (System.currentTimeMillis() - lastExitTime > 1000) {
-                showToast("再按一次退出本程序")
-                lastExitTime = System.currentTimeMillis()
-            } else {
-                exitFlag = true
-                // 通知Service中线程停止
-                val sendIntent = Intent(CONTROL_ACTION)
-                sendIntent.putExtra("control", CONTROL_EXIT)
-                sendBroadcast(sendIntent)
-
-                stopService(intentService)
-                exit()
-            }
-            return true
-        }
-        return super.onKeyDown(keyCode, event)
-    }
-
-    private fun exit() {
-        this.finish()
-
-        android.os.Process.killProcess(android.os.Process.myPid()) //获取PID
-        System.exit(0)
     }
 }

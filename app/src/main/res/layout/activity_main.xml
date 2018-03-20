@@ -40,7 +40,7 @@
             android:textStyle="normal|bold"
             android:textSize="18sp"
             android:id="@+id/currentSongText"
-            android:text="@string/now_playing" />
+            android:text="@string/current_song" />
     </LinearLayout>
 
 

@@ -1,4 +1,4 @@
-package ns.musicplayer
+package club.neils.musicplayer
 
 import android.app.Service
 import android.content.BroadcastReceiver
@@ -9,7 +9,6 @@ import android.media.MediaPlayer
 import android.os.IBinder
 import android.provider.MediaStore
 import java.util.concurrent.Executors
-import ns.musicplayer.Consts.*
 
 class MusicService : Service() {
 
@@ -24,6 +23,8 @@ class MusicService : Service() {
     private var singleThreadExecutor = Executors.newSingleThreadExecutor()
 
     private var mTotalTime = 0
+
+    private var exitFlag = false
 
     // 歌曲下标
     private var currentIndex = 0
@@ -48,13 +49,10 @@ class MusicService : Service() {
             return index
         }
 
-    private var exitFlag = false
-
 
     override fun onBind(intent: Intent): IBinder? {
         return null
     }
-
 
     override fun onDestroy() {
         mediaPlayer.stop()
@@ -62,7 +60,6 @@ class MusicService : Service() {
         unregisterReceiver(serviceReceiver)
         super.onDestroy()
     }
-
 
     override fun onCreate() {
         initMusicList()
@@ -77,7 +74,6 @@ class MusicService : Service() {
         super.onCreate()
     }
 
-
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
 
         val sendIntent = Intent(UPDATE_ACTION)
@@ -86,7 +82,6 @@ class MusicService : Service() {
 
         return super.onStartCommand(intent, flags, startId)
     }
-
 
     // 播放音乐
     private fun playMusic(path: String) {
@@ -126,7 +121,6 @@ class MusicService : Service() {
         }
     }
 
-
     // 初始化播放列表
     private fun initMusicList() {
         // 取得指定位置的文件设置显示到播放列表
@@ -148,7 +142,6 @@ class MusicService : Service() {
         cursor?.close()
     }
 
-
     // 更新总时间和显示的歌名
     private fun readyToPlay() {
         // 更新总时间
@@ -159,13 +152,12 @@ class MusicService : Service() {
         sendBroadcast(sendIntent)
 
         // 更新显示的歌名
-        val temp = resources.getString(R.string.now_playing) + musicList[currentIndex].title + " - " + musicList[currentIndex].artist
+        val temp = resources.getString(R.string.current_song) + musicList[currentIndex].title + " - " + musicList[currentIndex].artist
         val sendIntent2 = Intent(UPDATE_ACTION)
         sendIntent2.putExtra("update", UPDATE_CURRENT_SONG)
         sendIntent2.putExtra("currentSong", temp)
         sendBroadcast(sendIntent2)
     }
-
 
     // 更新进度条方法
     private fun sendTimePosition() {
@@ -191,7 +183,6 @@ class MusicService : Service() {
         }
     }
 
-
     // Service的Receiver
     private inner class MyServiceReceiver : BroadcastReceiver() {
 
@@ -206,18 +197,20 @@ class MusicService : Service() {
 
             // 点击播放/暂停按钮后
                 CONTROL_PLAY_PAUSE -> {
-                    if (status == STATUS_STOP) {
-                        playMusic(musicList[currentIndex].data)
-                        status = STATUS_PLAY
-                        readyToPlay()
-                    }
-                    else if (status == STATUS_PLAY) {
-                        mediaPlayer.pause()
-                        status = STATUS_PAUSE
-                    }
-                    else if (status == STATUS_PAUSE) {
-                        mediaPlayer.start()
-                        status = STATUS_PLAY
+                    when (status) {
+                        STATUS_STOP -> {
+                            playMusic(musicList[currentIndex].data)
+                            status = STATUS_PLAY
+                            readyToPlay()
+                        }
+                        STATUS_PLAY -> {
+                            mediaPlayer.pause()
+                            status = STATUS_PAUSE
+                        }
+                        STATUS_PAUSE -> {
+                            mediaPlayer.start()
+                            status = STATUS_PLAY
+                        }
                     }
                 }
 

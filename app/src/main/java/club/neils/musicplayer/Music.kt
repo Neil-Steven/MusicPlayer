@@ -1,11 +1,7 @@
-package ns.musicplayer
-
-/**
- * Created by neil on 2017/8/18.
- */
+package club.neils.musicplayer
 
 data class Music(
-        var filename: String,
+        var fileName: String,
         var title: String,
         var duration: Int = 0,
         var artist: String,
