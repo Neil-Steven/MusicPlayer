@@ -25,7 +25,7 @@
     <string name="no_permission">No read external storage permission! Exit now…</string>
 
     <!--About message-->
-    <string name="about_message">"Written by Neil Steven with Kotlin！\n\nThis demo is too simple to be useful, so just focus on the new language~"</string>
+    <string name="about_message">"Written by Neil Steven with Kotlin! \n\nThis demo is too simple to be useful, so just focus on the new language~"</string>
 
     <!--Need not translate-->
     <string name="app_name">Neil Music Player</string>

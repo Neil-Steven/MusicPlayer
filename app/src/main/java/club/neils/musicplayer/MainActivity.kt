@@ -350,7 +350,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     // MainActivity的Receiver
     inner class MyActivityReceiver : BroadcastReceiver() {
-
         override fun onReceive(context: Context, intent: Intent) {
             // 获取Intent中的update消息，update代表需要更新的状态
             val update = intent.getIntExtra("update", -1)

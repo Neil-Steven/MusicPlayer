@@ -1,5 +1,5 @@
 <resources>
-    <!--Menu-->
+    <!--菜单-->
     <string name="refresh_list">刷新列表</string>
     <string name="about">关于</string>
 
@@ -22,9 +22,9 @@
     <string name="circle">列表循环</string>
 
     <!--权限-->
-    <string name="no_permission">没有读取存储卡权限，本程序即将推出……</string>
+    <string name="no_permission">没有读取存储卡权限，本程序即将退出……</string>
 
     <!--关于信息-->
-    <string name="about_message">"Written by Neil Steven with Kotlin！\n\n本demo仅用于浅尝Kotlin语法，代码逻辑层面还有较多不完善的地方，仅供参考，日后如有时间再来填坑^_^"</string>
+    <string name="about_message">"Written by Neil Steven with Kotlin! \n\n本demo仅用于浅尝Kotlin语法，代码逻辑层面还有较多不完善的地方，仅供参考，日后如有时间再来填坑^_^"</string>
 
 </resources>

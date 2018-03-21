@@ -31,7 +31,9 @@ class MusicService : Service() {
 
     // 歌曲数量
     private val count: Int
-        get() { return musicList.count() }
+        get() {
+            return musicList.count()
+        }
 
 
     // 获取随机数，并保证随机播放时前后两首歌不重复
@@ -75,7 +77,6 @@ class MusicService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-
         val sendIntent = Intent(UPDATE_ACTION)
         sendIntent.putExtra("update", status)
         sendBroadcast(sendIntent)
@@ -185,7 +186,6 @@ class MusicService : Service() {
 
     // Service的Receiver
     private inner class MyServiceReceiver : BroadcastReceiver() {
-
         override fun onReceive(context: Context, intent: Intent) {
             val control = intent.getIntExtra("control", -1)
             when (control) {
