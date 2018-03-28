@@ -1,7 +1,7 @@
 # MusicPlayer
 
 * 语言：Kotlin 1.2.30
-* 编译平台：Android Studio 3.0.1
+* 编译平台：Android Studio 3.1.0
 
 
 这年头不给自己挖两个坑都不好意思说自己是程序猿！
