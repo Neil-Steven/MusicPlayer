@@ -1,43 +1,23 @@
 package club.neils.musicplayer
 
+import android.app.Activity
 import android.content.pm.PackageManager
-import android.content.Context
 
-fun getAppName(context: Context): String {
+fun Activity.getAppName(): String {
     var appName = ""
     try {
-        val labelRes = context.packageManager.getPackageInfo(context.packageName, 0).applicationInfo.labelRes
-        appName = context.resources.getString(labelRes)
+        val labelRes = this.packageManager.getPackageInfo(this.packageName, 0).applicationInfo.labelRes
+        appName = this.resources.getString(labelRes)
     } catch (e: PackageManager.NameNotFoundException) {
         e.printStackTrace()
     }
     return appName
 }
 
-fun getPackageName(context: Context): String {
-    var packageName = ""
-    try {
-        packageName = context.packageManager.getPackageInfo(context.packageName, 0).packageName
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
-    return packageName
-}
-
-fun getVersionCode(context: Context): Int {
-    var versionCode = 0
-    try {
-        versionCode = context.packageManager.getPackageInfo(context.packageName, 0).versionCode
-    } catch (e: PackageManager.NameNotFoundException) {
-        e.printStackTrace()
-    }
-    return versionCode
-}
-
-fun getVersionName(context: Context): String {
+fun Activity.getVersionName(): String {
     var versionName = ""
     try {
-        versionName = context.packageManager.getPackageInfo(context.getPackageName(), 0).versionName
+        versionName = this.packageManager.getPackageInfo(this.packageName, 0).versionName
     } catch (e: PackageManager.NameNotFoundException) {
         e.printStackTrace()
     }

@@ -153,7 +153,7 @@ class MusicService : Service() {
         sendBroadcast(sendIntent)
 
         // 更新显示的歌名
-        val temp = resources.getString(R.string.current_song) + musicList[currentIndex].title + " - " + musicList[currentIndex].artist
+        val temp = musicList[currentIndex].title + " - " + musicList[currentIndex].artist
         val sendIntent2 = Intent(UPDATE_ACTION)
         sendIntent2.putExtra("update", UPDATE_CURRENT_SONG)
         sendIntent2.putExtra("currentSong", temp)

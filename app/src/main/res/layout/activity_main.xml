@@ -9,146 +9,138 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        toolbar:title="@string/app_name"
         android:background="?attr/colorPrimary"
-        toolbar:titleTextAppearance="@style/ToolbarTitleText"
+        toolbar:popupTheme="@style/ToolbarPopupTheme"
         toolbar:theme="@style/ToolbarTheme"
-        toolbar:popupTheme="@style/ToolbarPopupTheme">
+        toolbar:title="@string/app_name"
+        toolbar:titleTextAppearance="@style/ToolbarTitleText">
+
     </android.support.v7.widget.Toolbar>
 
     <ListView
         android:id="@+id/musicListView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.53"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_weight="1"
+        android:footerDividersEnabled="false"
         android:headerDividersEnabled="false">
+
     </ListView>
 
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin">
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin">
+
         <TextView
-            android:layout_width="match_parent"
+            android:id="@+id/currentSongText"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:fontFamily="sans-serif"
-            android:textStyle="normal|bold"
-            android:textSize="18sp"
-            android:id="@+id/currentSongText"
-            android:text="@string/current_song" />
+            android:text="@string/current_song"
+            android:textSize="@dimen/song_info_text_size"
+            android:textStyle="normal" />
+
+        <TextView
+            android:id="@+id/currentSongInfo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_weight="1"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:fontFamily="sans-serif"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:textSize="@dimen/song_info_text_size"
+            android:textStyle="normal|bold" />
     </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:orientation="horizontal" >
-    </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin">
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin">
 
         <TextView
-            android:text="@string/init_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/playingTimeText"
-            android:textSize="14sp" />
-
-        <SeekBar android:layout_height="wrap_content"
-            android:id="@+id/seekBar"
-            android:layout_width="0dp"
-            android:layout_weight="0.1"
-            style="@style/Widget.AppCompat.SeekBar" />
-
-        <TextView
-            android:text="@string/init_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/init_time"
+            android:textSize="14sp" />
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            style="@style/Widget.AppCompat.SeekBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
             android:id="@+id/totalTimeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/init_time"
             android:textSize="14sp" />
 
     </LinearLayout>
 
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:orientation="horizontal" >
-    </LinearLayout>
-
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_marginBottom="@dimen/activity_vertical_margin">
 
+        <Button
+            android:id="@+id/modeButton"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="30dp"
+            android:layout_toStartOf="@+id/prevButton"
+            android:background="@drawable/circle_button_selector" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/prevButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="30dp"
+            android:layout_toStartOf="@+id/playButton"
+            android:background="@drawable/prev_button_selector" />
 
-            <Button
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:background="@drawable/circle_button_selector"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@+id/prevButton"
-                android:layout_marginEnd="30dp"
-                android:id="@+id/modeButton" />
+        <Button
+            android:id="@+id/playButton"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/play_button_selector"
+            android:textAlignment="center" />
 
-            <Button
-                android:id="@+id/prevButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/prev_button_selector"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@+id/playButton"
-                android:layout_marginEnd="30dp"
-                />
+        <Button
+            android:id="@+id/nextButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="30dp"
+            android:layout_toEndOf="@+id/playButton"
+            android:background="@drawable/next_button_selector" />
 
-            <Button
-                android:id="@+id/playButton"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:background="@drawable/play_button_selector"
-                android:textAlignment="center"
-                android:layout_centerHorizontal="true" />
+        <Button
+            android:id="@+id/minButton"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="30dp"
+            android:layout_toEndOf="@+id/nextButton"
+            android:background="@drawable/minimize_button_selector" />
 
-            <Button
-                android:id="@+id/nextButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/next_button_selector"
-                android:layout_centerVertical="true"
-                android:layout_toEndOf="@+id/playButton"
-                android:layout_marginStart="30dp" />
-
-            <Button
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:background="@drawable/minimize_button_selector"
-                android:id="@+id/minButton"
-                android:layout_centerVertical="true"
-                android:layout_toEndOf="@+id/nextButton"
-                android:layout_marginStart="30dp"/>
-
-        </RelativeLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:orientation="horizontal" >
-    </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>

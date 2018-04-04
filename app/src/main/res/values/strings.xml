@@ -4,7 +4,7 @@
     <string name="about">About</string>
 
     <!--MainActivity-->
-    <string name="current_song">Current song: \n</string>
+    <string name="current_song">Current song:</string>
 
     <!--Common-->
     <string name="ok">OK</string>

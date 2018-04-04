@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
                 R.id.about ->
                     AlertDialog.Builder(this)
-                            .setTitle(getAppName(this) + " " + getVersionName(this))
+                            .setTitle(getAppName() + " " + getVersionName())
                             .setMessage(R.string.about_message)
                             .setPositiveButton(R.string.got_it, null)
                             .show()
@@ -228,13 +228,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
         cursor?.close()
 
-        val adapter = SimpleAdapter(this,
+        musicListView.adapter = SimpleAdapter(this,
                 list,
                 R.layout.music_list,
                 arrayOf("name", "artist"),
                 intArrayOf(R.id.name, R.id.artist)
         )
-        musicListView.adapter = adapter
         musicListView.onItemClickListener = AdapterView.OnItemClickListener { _, _, current, _ ->
             val intent = Intent(CONTROL_ACTION)
             intent.putExtra("control", CONTROL_CUT_SONG)
@@ -375,7 +374,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 }
 
                 UPDATE_CURRENT_SONG -> {
-                    currentSongText.text = intent.getStringExtra("currentSong")
+                    currentSongInfo.text = intent.getStringExtra("currentSong")
                 }
             }
         }

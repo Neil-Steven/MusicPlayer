@@ -4,7 +4,7 @@
     <string name="about">关于</string>
 
     <!--MainActivity-->
-    <string name="current_song">当前正在播放：\n</string>
+    <string name="current_song">当前正在播放:</string>
 
     <!--通用-->
     <string name="ok">好的</string>
