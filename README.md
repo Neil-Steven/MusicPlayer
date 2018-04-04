@@ -27,4 +27,4 @@
 - 填个小坑，抽了一个晚上的时间把这个 app 小修小补了一下，总算完成了个小心愿！（笑）
 
 ### 效果图
-<img src="https://raw.githubusercontent.com/Neil-Steven/MusicPlayer/master/Screenshots/Screenshot_2018-04-04-23-59-59-702.png" width="450" height="800" />
+<img src="https://raw.githubusercontent.com/Neil-Steven/MusicPlayer/master/Screenshots/Screenshot_2018-04-04-23-59-59-702.png" width="400" height="800" />
